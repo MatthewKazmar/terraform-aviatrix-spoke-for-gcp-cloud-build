@@ -32,11 +32,11 @@ resource "google_compute_global_address" "worker_range" {
   address       = split("/", cidrsubnet(var.cidr, 1, 1))[0]
   address_type  = "INTERNAL"
   prefix_length = split("/", cidrsubnet(var.cidr, 1, 1))[1]
-  network       = module.cloud_build_spoke.vpc.vpc_id
+  network       = module.cloud_build_spoke.vpc.id
 }
 
 resource "google_service_networking_connection" "worker_pool_conn" {
-  network                 = module.cloud_build_spoke.vpc.vpc_id
+  network                 = module.cloud_build_spoke.vpc.id
   service                 = "servicenetworking.googleapis.com"
   reserved_peering_ranges = [google_compute_global_address.worker_range.name]
   depends_on              = [google_project_service.servicenetworking]
