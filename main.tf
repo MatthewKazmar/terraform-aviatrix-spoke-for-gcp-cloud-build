@@ -2,6 +2,10 @@ data "aviatrix_account" "this" {
   account_name = var.avx_gcp_account_name
 }
 
+data "google_project" "this" {
+  project_id = data.aviatrix_account.this.gcloud_project_id
+}
+
 module "cloud_build_spoke" {
   source                           = "terraform-aviatrix-modules/mc-spoke/aviatrix"
   version                          = "1.5.0"
@@ -61,7 +65,7 @@ resource "google_cloudbuild_worker_pool" "pool" {
     no_external_ip = var.worker_pool_use_external_ip
   }
   network_config {
-    peered_network          = google_service_networking_connection.worker_pool_conn.network
+    peered_network          = "projects/${data.google_project.this.number}/global/networks/${google_service_networking_connection.worker_pool_conn.network}"
     peered_network_ip_range = "/29"
   }
 }
