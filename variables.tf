@@ -43,7 +43,7 @@ variable "aviatrix_spoke_instance_size" {
 variable "worker_pool_instance_size" {
   description = "Size of the GCP Cloud Build worker instance."
   type        = string
-  default     = "n1-standard-1"
+  default     = "e2-medium"
 }
 
 variable "worker_pool_use_external_ip" {

@@ -42,13 +42,21 @@ resource "google_service_networking_connection" "worker_pool_conn" {
   depends_on              = [google_project_service.servicenetworking]
 }
 
+resource "google_compute_network_peering_routes_config" "peering_routes" {
+  peering = google_service_networking_connection.worker_pool_conn.peering
+  network = google_service_networking_connection.worker_pool_conn.network
+
+  import_custom_routes = true
+  export_custom_routes = true
+}
+
 resource "google_cloudbuild_worker_pool" "pool" {
   project = data.aviatrix_account.this.gcloud_project_id
 
   name     = "${var.name}-worker-pool"
   location = var.region
   worker_config {
-    disk_size_gb   = 30
+    disk_size_gb   = 100
     machine_type   = var.worker_pool_instance_size
     no_external_ip = var.worker_pool_use_external_ip
   }
