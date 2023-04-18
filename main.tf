@@ -11,7 +11,7 @@ module "cloud_build_spoke" {
   version                          = "1.5.0"
   cloud                            = "GCP"
   region                           = var.region
-  name                             = "${var.name}-spoke-vpc"
+  name                             = "${var.name}-spoke"
   gw_name                          = "${var.name}-spoke-gateway"
   instance_size                    = var.aviatrix_spoke_instance_size
   cidr                             = cidrsubnet(var.cidr, 1, 0)
