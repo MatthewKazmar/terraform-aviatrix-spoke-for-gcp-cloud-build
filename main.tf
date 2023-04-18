@@ -36,8 +36,6 @@ resource "google_compute_global_address" "worker_range" {
 }
 
 resource "google_service_networking_connection" "worker_pool_conn" {
-  project = data.aviatrix_account.this.gcloud_project_id
-
   network                 = module.cloud_build_spoke.vpc.vpc_id
   service                 = "servicenetworking.googleapis.com"
   reserved_peering_ranges = [google_compute_global_address.worker_range.name]
