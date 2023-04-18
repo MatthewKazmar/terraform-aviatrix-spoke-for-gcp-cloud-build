@@ -13,6 +13,7 @@ variable "network_domain" {
   type        = string
   default     = null
 }
+
 variable "name" {
   description = "Name of the Cloud Build spoke."
   type        = string

@@ -29,9 +29,9 @@ resource "google_compute_global_address" "worker_range" {
 
   name          = "worker-pool-range"
   purpose       = "VPC_PEERING"
-  address       = split(cidrsubnet("/", var.cidr, 1, 1))[0]
+  address       = split("/", cidrsubnet(var.cidr, 1, 1))[0]
   address_type  = "INTERNAL"
-  prefix_length = split(cidrsubnet("/", var.cidr, 1, 1))[1]
+  prefix_length = split("/", cidrsubnet(var.cidr, 1, 1))[1]
   network       = module.cloud_build_spoke.vpc.vpc_id
 }
 
