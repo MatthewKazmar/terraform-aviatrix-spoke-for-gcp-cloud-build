@@ -45,7 +45,7 @@ resource "google_service_networking_connection" "worker_pool_conn" {
 resource "google_cloudbuild_worker_pool" "pool" {
   project = data.aviatrix_account.this.gcloud_project_id
 
-  name     = "${name}-worker-pool"
+  name     = "${var.name}-worker-pool"
   location = var.region
   worker_config {
     disk_size_gb   = 30
