@@ -20,7 +20,7 @@ module "cloud_build_spoke" {
   included_advertised_spoke_routes = var.cidr
 }
 
-# Private pool creation
+# Enable service networking and cloud build apis.
 resource "google_project_service" "servicenetworking" {
   project = data.aviatrix_account.this.gcloud_project_id
 
@@ -28,6 +28,14 @@ resource "google_project_service" "servicenetworking" {
   disable_on_destroy = false
 }
 
+resource "google_project_service" "cloud_build" {
+  project = data.aviatrix_account.this.gcloud_project_id
+
+  service            = "cloudbuild.googleapis.com"
+  disable_on_destroy = false
+}
+
+# Set up service networking.
 resource "google_compute_global_address" "worker_range" {
   project = data.aviatrix_account.this.gcloud_project_id
 
@@ -54,6 +62,7 @@ resource "google_compute_network_peering_routes_config" "peering_routes" {
   export_custom_routes = true
 }
 
+# Private pool creation
 resource "google_cloudbuild_worker_pool" "pool" {
   project = data.aviatrix_account.this.gcloud_project_id
 
@@ -91,4 +100,30 @@ resource "google_compute_route" "ha_spoke" {
   next_hop_instance      = module.cloud_build_spoke.spoke_gateway.ha_gw_name
   next_hop_instance_zone = module.cloud_build_spoke.spoke_gateway.ha_zone
   priority               = 500
+}
+
+# Set IAM for Cloud build.
+resource "google_project_service_identity" "sa" {
+  provider = google-beta
+
+  project = data.aviatrix_account.this.gcloud_project_id
+  service = "cloudbuild.googleapis.com"
+}
+
+resource "google_project_iam_member" "compute" {
+  project = data.aviatrix_account.this.gcloud_project_id
+  role    = "roles/compute.instanceAdmin.v1"
+  member  = "serviceAccount:${google_project_service_identity.sa.email}"
+}
+
+resource "google_project_iam_member" "gke" {
+  project = data.aviatrix_account.this.gcloud_project_id
+  role    = "roles/container.developer"
+  member  = "serviceAccount:${google_project_service_identity.sa.email}"
+}
+
+resource "google_project_iam_member" "worker_pool" {
+  project = data.aviatrix_account.this.gcloud_project_id
+  role    = "roles/cloudbuild.workerPoolUser"
+  member  = "serviceAccount:${google_project_service_identity.sa.email}"
 }
