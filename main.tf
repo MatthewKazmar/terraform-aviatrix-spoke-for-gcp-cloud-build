@@ -88,7 +88,7 @@ resource "google_compute_route" "primary_spoke" {
   network                = module.cloud_build_spoke.vpc.id
   next_hop_instance      = module.cloud_build_spoke.spoke_gateway.gw_name
   next_hop_instance_zone = module.cloud_build_spoke.spoke_gateway.vpc_reg
-  priority               = 500
+  priority               = 1200
 }
 
 resource "google_compute_route" "ha_spoke" {
@@ -99,7 +99,7 @@ resource "google_compute_route" "ha_spoke" {
   network                = module.cloud_build_spoke.vpc.id
   next_hop_instance      = module.cloud_build_spoke.spoke_gateway.ha_gw_name
   next_hop_instance_zone = module.cloud_build_spoke.spoke_gateway.ha_zone
-  priority               = 500
+  priority               = 1200
 }
 
 # Set IAM for Cloud build.
