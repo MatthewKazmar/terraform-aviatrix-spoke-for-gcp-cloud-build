@@ -62,7 +62,7 @@ resource "google_cloudbuild_worker_pool" "pool" {
   worker_config {
     disk_size_gb   = 100
     machine_type   = var.worker_pool_instance_size
-    no_external_ip = var.worker_pool_use_external_ip
+    no_external_ip = var.use_aviatrix_firenet_egress
   }
   network_config {
     peered_network          = "projects/${data.google_project.this.number}/global/networks/${google_service_networking_connection.worker_pool_conn.network}"
