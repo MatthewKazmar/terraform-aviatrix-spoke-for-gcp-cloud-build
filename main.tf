@@ -69,3 +69,26 @@ resource "google_cloudbuild_worker_pool" "pool" {
     peered_network_ip_range = "/29"
   }
 }
+
+# Needed for egress because the avx-snat-noip route will not pass across the peering.
+resource "google_compute_route" "primary_spoke" {
+  count = var.use_aviatrix_firenet_egress ? 1 : 0
+
+  name                   = "avx-firenet-egress-primary"
+  dest_range             = "0.0.0.0/0"
+  network                = module.cloud_build_spoke.vpc.id
+  next_hop_instance      = module.cloud_build_spoke.spoke_gateway.gw_name
+  next_hop_instance_zone = module.cloud_build_spoke.spoke_gateway.vpc_reg
+  priority               = 500
+}
+
+resource "google_compute_route" "ha_spoke" {
+  count = var.use_aviatrix_firenet_egress ? 1 : 0
+
+  name                   = "avx-firenet-egress-ha"
+  dest_range             = "0.0.0.0/0"
+  network                = module.cloud_build_spoke.vpc.id
+  next_hop_instance      = module.cloud_build_spoke.spoke_gateway.ha_gw_name
+  next_hop_instance_zone = module.cloud_build_spoke.spoke_gateway.ha_zone
+  priority               = 500
+}

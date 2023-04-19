@@ -46,8 +46,8 @@ variable "worker_pool_instance_size" {
   default     = "e2-medium"
 }
 
-variable "worker_pool_use_external_ip" {
-  description = "Use Aviatrix Spoke gateway for Internet egress."
+variable "use_aviatrix_firenet_egress" {
+  description = "Apply the avx_snat_noip tag to nodes for Egress."
   type        = bool
-  default     = false
+  default     = true
 }
