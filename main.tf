@@ -18,6 +18,7 @@ module "cloud_build_spoke" {
   account                          = var.avx_gcp_account_name
   transit_gw                       = var.transit_gateway_name
   included_advertised_spoke_routes = var.cidr
+  network_domain                   = var.network_domain
 }
 
 # Enable service networking and cloud build apis.

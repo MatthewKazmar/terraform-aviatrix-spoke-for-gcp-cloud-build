@@ -53,6 +53,6 @@ variable "use_aviatrix_firenet_egress" {
 }
 
 locals {
-  spoke_cidr = cidrsubnet(var.cidr, 1, 0)
+  spoke_cidr             = cidrsubnet(var.cidr, 1, 0)
   servicenetworking_cidr = cidrsubnet(var.cidr, 1, 1)
 }
