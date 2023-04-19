@@ -81,7 +81,7 @@ resource "google_cloudbuild_worker_pool" "pool" {
 
 # Add firewall rule for Service Networking CIDR
 resource "google_compute_firewall" "default" {
-  name    = "test-firewall"
+  name    = "cloudbuild-to-avx"
   network = module.cloud_build_spoke.vpc.id
 
   allow {
