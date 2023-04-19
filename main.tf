@@ -14,7 +14,7 @@ module "cloud_build_spoke" {
   name                             = "${var.name}-spoke"
   gw_name                          = "${var.name}-spoke-gateway"
   instance_size                    = var.aviatrix_spoke_instance_size
-  cidr                             = cidrsubnet(var.cidr, 1, 0)
+  cidr                             = local.spoke_cidr
   account                          = var.avx_gcp_account_name
   transit_gw                       = var.transit_gateway_name
   included_advertised_spoke_routes = var.cidr
@@ -41,9 +41,9 @@ resource "google_compute_global_address" "worker_range" {
 
   name          = "worker-pool-range"
   purpose       = "VPC_PEERING"
-  address       = split("/", cidrsubnet(var.cidr, 1, 1))[0]
+  address       = split("/", local.servicenetworking_cidr)[0]
   address_type  = "INTERNAL"
-  prefix_length = split("/", cidrsubnet(var.cidr, 1, 1))[1]
+  prefix_length = split("/", local.servicenetworking_cidr)[1]
   network       = module.cloud_build_spoke.vpc.id
 }
 
@@ -77,6 +77,20 @@ resource "google_cloudbuild_worker_pool" "pool" {
     peered_network          = "projects/${data.google_project.this.number}/global/networks/${google_service_networking_connection.worker_pool_conn.network}"
     peered_network_ip_range = "/29"
   }
+}
+
+# Add firewall rule for Service Networking CIDR
+resource "google_compute_firewall" "default" {
+  name    = "test-firewall"
+  network = module.cloud_build_spoke.vpc.id
+
+  allow {
+    protocol = "all"
+  }
+
+  source_ranges = [local.servicenetworking_cidr]
+
+  target_tags = [module.cloud_build_spoke.spoke_gateway.gw_name, module.cloud_build_spoke.spoke_gateway.ha_gw_name]
 }
 
 # Needed for egress because the avx-snat-noip route will not pass across the peering.
